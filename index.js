@@ -55,6 +55,10 @@ app.post('/generateResponse', async (req, res) => {
   }
 });
 
+app.get('/', (req, res) => {
+  res.send('Server läuft!');
+});
+
 app.listen(PORT, () => {
   console.log(`Server läuft auf http://localhost:${PORT}`);
 });
