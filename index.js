@@ -52,9 +52,10 @@ app.post('/generateResponse', async (req, res) => {
       },
       {
         headers: {
-          'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-          'Content-Type': 'application/json'
-        }
+  'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+  'Content-Type': 'application/json',
+  'HTTP-Referer': 'https://chat.openai.com'
+}
       }
     );
 
