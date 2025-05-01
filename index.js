@@ -8,6 +8,7 @@ const PORT = process.env.PORT || 3000;
 
 // API-Key aus Railway-Variable
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+console.log("OpenRouter Key geladen:", OPENROUTER_API_KEY);
 
 const limiter = rateLimit({
   windowMs: 60 * 1000,
