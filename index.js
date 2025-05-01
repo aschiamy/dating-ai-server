@@ -1,37 +1,26 @@
 const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
-const rateLimit = require('express-rate-limit');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// TESTWEISE DIREKT EINGESETZTER API-KEY (bitte später wieder entfernen!)
+// TESTWEISE DIREKT EINGESETZT
 const OPENROUTER_API_KEY = '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';
-
-const limiter = rateLimit({
-  windowMs: 60 * 1000,
-  max: 20,
-  message: { error: 'Zu viele Anfragen. Bitte warte kurz.' }
-});
 
 app.use(cors());
 app.use(express.json());
-app.use(limiter);
 
-// POST-Endpunkt für Chat
+// POST-Endpunkt
 app.post('/generateResponse', async (req, res) => {
   const { userInput } = req.body;
-
-  if (!userInput) {
-    return res.status(400).json({ error: 'Eingabe fehlt!' });
-  }
+  if (!userInput) return res.status(400).json({ error: 'Eingabe fehlt' });
 
   try {
     const response = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
-      model: 'openrouter/mythomax-l2-13b',
+      model: 'openrouter/mythomax-13b',
       messages: [
-        { role: 'system', content: 'Du bist ein charmanter Dating-Coach. Gib kurze, einfühlsame, hilfreiche Antworten.' },
+        { role: 'system', content: 'Du bist ein charmanter Dating-Coach.' },
         { role: 'user', content: userInput }
       ]
     }, {
@@ -56,11 +45,10 @@ app.post('/generateResponse', async (req, res) => {
   }
 });
 
-// GET-Test-Endpunkt für Browser-Zugriff
 app.get('/', (req, res) => {
   res.send('Server läuft!');
 });
 
 app.listen(PORT, () => {
-  console.log(`Server läuft auf http://localhost:${PORT}`);
+  console.log(`Server läuft auf Port ${PORT}`);
 });
