@@ -29,7 +29,7 @@ app.post('/generateResponse', async (req, res) => {
 
   try {
     const response = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
-      model: 'openrouter/mistral-7b-instruct',
+      model: 'openrouter/güt-3.5-turbo',
       messages: [
         { role: 'system', content: 'Du bist ein charmanter Dating-Coach. Gib kurze, einfühlsame, hilfreiche Antworten.' },
         { role: 'user', content: userInput }
