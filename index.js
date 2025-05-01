@@ -36,7 +36,7 @@ app.post('/generateResponse', async (req, res) => {
       ]
     }, {
       headers: {
-        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+        'Authorization': `Bearer ${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}`,
         'Content-Type': 'application/json'
       }
     });
