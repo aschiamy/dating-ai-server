@@ -7,7 +7,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // API-Key aus Railway-Variable
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+const OPENROUTER_API_KEY = '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'; // <-- dein echter Key hier
 console.log("OpenRouter Key geladen:", OPENROUTER_API_KEY);
 
 const limiter = rateLimit({
