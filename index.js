@@ -6,7 +6,7 @@ const rateLimit = require('express-rate-limit');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// OpenRouter API-Key aus Umgebungsvariablen (Render)
+// OpenRouter API-Key wird aus Umgebungsvariable geladen
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 
 const limiter = rateLimit({
@@ -29,14 +29,14 @@ app.post('/generateResponse', async (req, res) => {
 
   try {
     const response = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
-      model: 'openrouter/güt-3.5-turbo',
+      model: 'openrouter/mythomax-l2-13b',
       messages: [
         { role: 'system', content: 'Du bist ein charmanter Dating-Coach. Gib kurze, einfühlsame, hilfreiche Antworten.' },
         { role: 'user', content: userInput }
       ]
     }, {
       headers: {
-        'Authorization': `Bearer ${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}`,
+        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
         'Content-Type': 'application/json'
       }
     });
@@ -49,13 +49,14 @@ app.post('/generateResponse', async (req, res) => {
       flirtTip: 'Ein ehrliches Lächeln wirkt Wunder.',
       rawAIResponse: answer
     });
+
   } catch (error) {
-    console.error(error.response?.data || error.message);
-    res.status(500).json({ error: 'Fehler bei der KI-Anfrage.' });
+    console.error('Fehler bei der Anfrage:', error.response?.data || error.message);
+    res.status(500).json({ error: error.response?.data || error.message });
   }
 });
 
-// Test-Route für GET
+// GET-Testroute für Browserzugriff
 app.get('/', (req, res) => {
   res.send('Server läuft!');
 });
