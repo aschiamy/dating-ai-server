@@ -8,9 +8,8 @@ const PORT = process.env.PORT || 3000;
 
 // OpenRouter API-Key wird aus Umgebungsvariable geladen
 
-
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || 'kein_key_gefunden';
-console.log('OpenRouter Key geladen:', OPENROUTER_API_KEY.substring(0, 10), '...');
+console.log("KEY:", OPENROUTER_API_KEY);
 
 const limiter = rateLimit({
   windowMs: 60 * 1000,
