@@ -8,8 +8,8 @@ const PORT = process.env.PORT || 3000;
 
 // OpenRouter API-Key wird aus Umgebungsvariable geladen
 
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || 'kein_key_gefunden';
-console.log("KEY:", OPENROUTER_API_KEY);
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || 'DEIN_KEY_FÜR_LOKALE_TESTS';
+console.log('OpenRouter Key geladen:', OPENROUTER_API_KEY ? 'JA' : 'NEIN');
 
 const limiter = rateLimit({
   windowMs: 60 * 1000,
@@ -38,9 +38,9 @@ app.post('/generateResponse', async (req, res) => {
       ]
     }, {
       headers: {
-        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-        'Content-Type': 'application/json'
-      }
+  'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+  'Content-Type': 'application/json'
+}
     });
 
     const answer = response.data.choices[0].message.content;
