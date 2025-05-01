@@ -6,11 +6,11 @@ const rateLimit = require('express-rate-limit');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// OpenRouter API-Key wird aus Umgebungsvariable geladen
-
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || 'DEIN_KEY_FÜR_LOKALE_TESTS';
+// OpenRouter API-Key aus Umgebungsvariablen oder fallback lokal
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || 'DEIN_FALLBACK_KEY';
 console.log('OpenRouter Key geladen:', OPENROUTER_API_KEY ? 'JA' : 'NEIN');
 
+// Rate Limiting
 const limiter = rateLimit({
   windowMs: 60 * 1000,
   max: 20,
@@ -21,7 +21,12 @@ app.use(cors());
 app.use(express.json());
 app.use(limiter);
 
-// POST-Endpunkt für Chat
+// Test-GET-Endpunkt für Render
+app.get('/', (req, res) => {
+  res.send('Server läuft!');
+});
+
+// POST-Endpunkt für die KI
 app.post('/generateResponse', async (req, res) => {
   const { userInput } = req.body;
 
@@ -31,16 +36,16 @@ app.post('/generateResponse', async (req, res) => {
 
   try {
     const response = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
-     model: 'mistralai/mixtral-8x7b',
+      model: 'openrouter/mythomax-12-13b',
       messages: [
         { role: 'system', content: 'Du bist ein charmanter Dating-Coach. Gib kurze, einfühlsame, hilfreiche Antworten.' },
         { role: 'user', content: userInput }
       ]
     }, {
       headers: {
-  'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-  'Content-Type': 'application/json'
-}
+        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+        'Content-Type': 'application/json'
+      }
     });
 
     const answer = response.data.choices[0].message.content;
@@ -56,11 +61,6 @@ app.post('/generateResponse', async (req, res) => {
     console.error('Fehler bei der Anfrage:', error.response?.data || error.message);
     res.status(500).json({ error: error.response?.data || error.message });
   }
-});
-
-// GET-Testroute für Browserzugriff
-app.get('/', (req, res) => {
-  res.send('Server läuft!');
 });
 
 app.listen(PORT, () => {
