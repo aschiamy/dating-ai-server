@@ -4,10 +4,10 @@ const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 
 const app = express();
-app.set('trust proxy', 1); // wichtig für Railway
-
 const PORT = process.env.PORT || 3000;
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY; // aus Railway-Variable
+
+// API-Key aus Railway-Variable
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 
 const limiter = rateLimit({
   windowMs: 60 * 1000,
@@ -19,12 +19,7 @@ app.use(cors());
 app.use(express.json());
 app.use(limiter);
 
-// Test-Route
-app.get('/', (req, res) => {
-  res.send('Server läuft!');
-});
-
-// POST-Endpunkt
+// POST-Endpunkt für Chat
 app.post('/generateResponse', async (req, res) => {
   const { userInput } = req.body;
 
@@ -33,22 +28,18 @@ app.post('/generateResponse', async (req, res) => {
   }
 
   try {
-    const response = await axios.post(
-      'https://openrouter.ai/api/v1/chat/completions',
-      {
-        model: 'openrouter/mistral-7b-instruct',
-        messages: [
-          { role: 'system', content: 'Du bist ein charmanter Dating-Coach.' },
-          { role: 'user', content: userInput }
-        ]
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${OPENROUTER_API_KEY}`,
-          'Content-Type': 'application/json'
-        }
+    const response = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
+      model: 'openrouter/mistral-7b',
+      messages: [
+        { role: 'system', content: 'Du bist ein charmanter Dating-Coach. Gib kurze, einfühlsame, hilfreiche Antworten.' },
+        { role: 'user', content: userInput }
+      ]
+    }, {
+      headers: {
+        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+        'Content-Type': 'application/json'
       }
-    );
+    });
 
     const answer = response.data.choices[0].message.content;
     res.json({
@@ -57,10 +48,16 @@ app.post('/generateResponse', async (req, res) => {
       flirtTip: 'Ein ehrliches Lächeln wirkt Wunder.',
       rawAIResponse: answer
     });
+
   } catch (error) {
     console.error('Fehler bei der Anfrage:', error.response?.data || error.message);
     res.status(500).json({ error: error.response?.data || error.message });
   }
+});
+
+// Testroute
+app.get('/', (req, res) => {
+  res.send('Server läuft!');
 });
 
 app.listen(PORT, () => {
