@@ -34,18 +34,22 @@ app.post('/generateResponse', async (req, res) => {
   }
 
   try {
-    const response = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
-      model: 'openrouter/mistral-7b',
-      messages: [
-        { role: 'system', content: 'Du bist ein charmanter Dating-Coach. Gib kurze, einfühlsame, hilfreiche Antworten.' },
-        { role: 'user', content: userInput }
-      ]
-    }, {
-      headers: {
-        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-        'Content-Type': 'application/json'
-      }
-    });
+    const response = await axios.post(
+  'https://openrouter.ai/api/v1/chat/completions',
+  {
+    model: 'openrouter/mistral-7b',
+    messages: [
+      { role: 'system', content: 'Du bist ein charmanter Dating-Coach. Gib kurze, einfühlsame, hilfreiche Antworten.' },
+      { role: 'user', content: userInput }
+    ]
+  },
+  {
+    headers: {
+      'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+      'Content-Type': 'application/json'
+    }
+  }
+);
 
     const answer = response.data.choices[0].message.content;
     res.json({
