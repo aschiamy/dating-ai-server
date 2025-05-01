@@ -6,22 +6,18 @@ const rateLimit = require('express-rate-limit');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.set('trust proxy', true); // Für Railway notwendig
-
-// API-Key aus Umgebungsvariablen
+// OpenRouter API-Key aus Umgebungsvariable
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-if (!OPENROUTER_API_KEY) {
-  console.error('FEHLER: Kein OpenRouter API-Key gefunden.');
-} else {
-  console.log('OpenRouter Key geladen:', OPENROUTER_API_KEY.slice(0, 8) + '...');
-}
+console.log('OpenRouter Key geladen:', OPENROUTER_API_KEY);
 
+// Rate Limiting
 const limiter = rateLimit({
   windowMs: 60 * 1000,
   max: 20,
   message: { error: 'Zu viele Anfragen. Bitte warte kurz.' }
 });
 
+app.set('trust proxy', true); // Wichtig für Railway + Rate-Limiting
 app.use(cors());
 app.use(express.json());
 app.use(limiter);
@@ -30,52 +26,55 @@ app.use(limiter);
 app.post('/generateResponse', async (req, res) => {
   const { userInput } = req.body;
 
-  console.log('POST /generateResponse empfangen');
-  console.log('User Input:', userInput);
-
   if (!userInput) {
-    console.warn('Warnung: Keine Eingabe erhalten.');
     return res.status(400).json({ error: 'Eingabe fehlt!' });
   }
 
-  try {
-    console.log('Sende Anfrage an OpenRouter...');
+  console.log('POST /generateResponse empfangen');
+  console.log('User Input:', userInput);
+  console.log('Sende Anfrage an OpenRouter...');
 
+  try {
     const response = await axios.post(
       'https://openrouter.ai/api/v1/chat/completions',
       {
         model: 'openrouter/mistral-7b',
         messages: [
-          { role: 'system', content: 'Du bist ein charmanter Dating-Coach. Gib kurze, einfühlsame Antworten.' },
-          { role: 'user', content: userInput }
+          {
+            role: 'system',
+            content: 'Du bist ein charmanter Dating-Coach. Gib kurze, einfühlsame, hilfreiche Antworten.'
+          },
+          {
+            role: 'user',
+            content: userInput
+          }
         ]
       },
       {
         headers: {
-  'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-  'Content-Type': 'application/json',
-  'HTTP-Referer': 'https://chat.openai.com'
-}
+          'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+          'Content-Type': 'application/json',
+          'HTTP-Referer': 'https://chat.openai.com' // <- Wichtig!
+        }
       }
     );
 
-    console.log('Antwort erhalten von OpenRouter');
     const answer = response.data.choices[0].message.content;
+
     res.json({
-      answer: answer,
+      answer,
       emotion: 'ermutigend',
       flirtTip: 'Ein ehrliches Lächeln wirkt Wunder.',
       rawAIResponse: answer
     });
 
   } catch (error) {
-    console.error('Fehler bei der Anfrage an OpenRouter:');
-    console.error(error.response?.data || error.message);
+    console.error('Fehler bei der Anfrage an OpenRouter:', error.response?.data || error.message);
     res.status(500).json({ error: error.response?.data || error.message });
   }
 });
 
-// GET-Test-Route
+// Test-Endpunkt für Browser
 app.get('/', (req, res) => {
   res.send('Server läuft!');
 });
