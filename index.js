@@ -6,24 +6,29 @@ const rateLimit = require('express-rate-limit');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// API-Key aus Railway-Variable
-const OPENROUTER_API_KEY = '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'; // <-- dein echter Key hier
-console.log("OpenRouter Key geladen:", OPENROUTER_API_KEY);
+// === Wichtig für Railway ===
+app.set('trust proxy', 1);
 
+// === API-Key als Variable (z. B. in Railway → Variables) ===
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+console.log("OpenRouter Key geladen:", OPENROUTER_API_KEY?.slice(0, 10) + '...');
+
+// === Rate Limiting ===
 const limiter = rateLimit({
   windowMs: 60 * 1000,
   max: 20,
-  message: { error: 'Zu viele Anfragen. Bitte warte kurz.' }
+  message: { error: 'Zu viele Anfragen. Bitte warte kurz.' },
+  standardHeaders: true,
+  legacyHeaders: false
 });
 
 app.use(cors());
 app.use(express.json());
 app.use(limiter);
 
-// POST-Endpunkt für Chat
+// === POST-Endpunkt für KI-Antwort ===
 app.post('/generateResponse', async (req, res) => {
   const { userInput } = req.body;
-
   if (!userInput) {
     return res.status(400).json({ error: 'Eingabe fehlt!' });
   }
@@ -44,7 +49,7 @@ app.post('/generateResponse', async (req, res) => {
 
     const answer = response.data.choices[0].message.content;
     res.json({
-      answer,
+      answer: answer,
       emotion: 'ermutigend',
       flirtTip: 'Ein ehrliches Lächeln wirkt Wunder.',
       rawAIResponse: answer
@@ -56,7 +61,7 @@ app.post('/generateResponse', async (req, res) => {
   }
 });
 
-// Testroute
+// === Test-Route ===
 app.get('/', (req, res) => {
   res.send('Server läuft!');
 });
