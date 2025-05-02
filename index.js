@@ -14,7 +14,10 @@ console.log('OpenRouter Key geladen:', OPENROUTER_API_KEY);
 const limiter = rateLimit({
   windowMs: 60 * 1000,
   max: 20,
-  message: { error: 'Zu viele Anfragen. Bitte warte kurz.' }
+  message: { error: 'Zu viele Anfragen. Bitte warte kurz.' },
+  validate: {
+    trustProxy: false
+  }
 });
 
 app.set('trust proxy', 1); // Wichtig für Railway + Rate-Limiting
