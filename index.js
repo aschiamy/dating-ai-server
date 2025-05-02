@@ -23,7 +23,8 @@ app.use(express.json());
 app.use(limiter);
 
 // POST-Endpunkt für Chat
-app.post('/generateResponse', async (req, res) => {
+
+app.post("/generateResponse", async (req, res) => {
   const { userInput } = req.body;
 
   if (!userInput) {
