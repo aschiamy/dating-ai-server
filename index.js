@@ -17,7 +17,7 @@ const limiter = rateLimit({
   message: { error: 'Zu viele Anfragen. Bitte warte kurz.' }
 });
 
-app.set('trust proxy', true); // Wichtig für Railway + Rate-Limiting
+app.set('trust proxy', 1); // Wichtig für Railway + Rate-Limiting
 app.use(cors());
 app.use(express.json());
 app.use(limiter);
